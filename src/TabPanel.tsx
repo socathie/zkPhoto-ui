@@ -6,6 +6,7 @@ import Box from '@mui/material/Box';
 import About from './tabs/About';
 import View from './tabs/View';
 import Upload from './tabs/Upload';
+import Verify from './tabs/Verify';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -76,7 +77,7 @@ export default function BasicTabs() {
         <Upload />
       </TabPanel>
       <TabPanel value={value} index={4}>
-        Verify
+        <Verify />
       </TabPanel>
       <TabPanel value={value} index={5}>
         <View />

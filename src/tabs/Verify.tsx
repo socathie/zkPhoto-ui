@@ -10,14 +10,15 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Alert from "@mui/material/Alert";
 import Loading from './components/Loading';
+import { generateWitness, getTokenURI, getTokenData } from "../zkPhoto";
+import array2uri from "../util/array2uri";
+import img2array from "../util/img2array";
+import DropzoneComponent from "./components/DropzoneComponent";
 
-import { getTokenURI, getTokenData } from "../zkPhoto";
-import array2uri from '../util/array2uri';
-
-export default function View() {
+export default function Upload() {
 
     const [tokenId, setTokenId] = useState("");
-    const [disable, setDisable] = useState(true);
+    const [idDisable, setIdDisable] = useState(true);
     const [loaded, setLoaded] = useState(false);
     const [metadata, setMetadata] = useState({
         "id": "",
@@ -25,16 +26,47 @@ export default function View() {
         "description": "",
         "image": ""
     });
-    const [image, setImage] = useState("");
+
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
+    const [generating, setGenerating] = useState(false);
+    const [converting, setConverting] = useState(false);
 
-    const submitTokenId = async (event: any) => {
+    const [fullImage, setFullImage] = useState("");
+    const [zkImage, setZkImage] = useState("");
+    const [tokenImage, setTokenImage] = useState("");
+
+    const [imageDisable, setImageDisable] = useState(true);
+    const [resizing, setResizing] = useState(false);
+    const [key, setKey] = useState(0);
+
+    const verifyToken = async (event: any) => {
         event.preventDefault();
         setError(false);
-        setLoading(true);
         setLoaded(false);
+
+        setResizing(true);
+        let tmp = img2array('full-image');
+        setFullImage(tmp.dataURL);
+        setResizing(false);
+
+        setGenerating(true);
+        let witness = await generateWitness(tmp.data)
+            .catch((error: any) => {
+                setErrorMsg(error);
+                setError(true);
+                setGenerating(false);
+                throw error;
+            });
+        setGenerating(false);
+
+        setConverting(true);
+        let tmpImage = array2uri(witness.d);
+        setZkImage(tmpImage);
+        setConverting(false);
+
+        setLoading(true);
         let tokenURI = await getTokenURI(parseInt(tokenId))
             .catch((error: any) => {
                 setErrorMsg(error);
@@ -47,6 +79,7 @@ export default function View() {
             const json = await response.json();
             if (json) {
                 setMetadata({ ...json, "id": tokenId });
+                setLoaded(true);
             }
         }
         let tokenData = await getTokenData(parseInt(tokenId))
@@ -56,8 +89,11 @@ export default function View() {
                 setLoading(false);
                 throw error;
             });
-        setImage(array2uri(tokenData));
-        
+        setTokenImage(array2uri(tokenData));
+
+        setKey(key+1);
+        setImageDisable(true);
+
         setLoading(false);
         setLoaded(true);
         event.preventDefault();
@@ -66,10 +102,10 @@ export default function View() {
     const inputHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.value !== "" && event.target.value !== "0") {
             setTokenId(event.target.value);
-            setDisable(false);
+            setIdDisable(false);
         }
         else {
-            setDisable(true);
+            setIdDisable(true);
         }
     };
 
@@ -78,6 +114,7 @@ export default function View() {
             event.preventDefault();
         }
     };
+
 
     const keyHandler = async (event: any) => {
         if (['e', 'E', '+', '-', '.', 'Enter'].includes(event.key)) {
@@ -89,7 +126,7 @@ export default function View() {
         return (
             <TableContainer
                 component={Paper}
-                sx={{ width: "99%", maxWidth: 600, margin: 'auto'}}
+                sx={{ width: "99%", maxWidth: 600, margin: 'auto' }}
             >
                 <Table aria-label="spanning table">
                     <TableBody>
@@ -103,16 +140,23 @@ export default function View() {
                             <TableCell>Description: {metadata.description}</TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell><figure><img src={image} width="100%" alt="" /><figcaption>ZK image</figcaption></figure></TableCell>
+                            <TableCell><figure><img src={fullImage} width="100%" alt="" /><figcaption>Uploaded image</figcaption></figure></TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell><figure><img src={zkImage} width="100%" alt="" /><figcaption>Downsized image</figcaption></figure></TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell><figure><img src={tokenImage} width="100%" alt="" /><figcaption>ZK image</figcaption></figure></TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell><figure><img src={metadata.image} width="100%" alt="" /><figcaption>URI image</figcaption></figure></TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell>{image === metadata.image ? <Alert severity="success">Images match.</Alert> : <Alert severity="warning">Images do not match.</Alert>}</TableCell>
+                            <TableCell>{tokenImage === metadata.image && zkImage === tokenImage ? <Alert severity="success">Images match.</Alert> : <Alert severity="warning">Images do not match.</Alert>}</TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>
+
             </TableContainer>
         )
     }
@@ -122,11 +166,13 @@ export default function View() {
             component="form"
             sx={{
                 "& .MuiTextField-root": { m: 1, width: "25ch" },
+                width: "99%", maxWidth: 600, margin: 'auto'
             }}
             noValidate
             autoComplete="off"
             textAlign="center"
         >
+            <DropzoneComponent key={key} setDisable={setImageDisable} />
             <TextField
                 id="token-id"
                 label="Token ID"
@@ -143,15 +189,19 @@ export default function View() {
                 onKeyPress={enterHandler}
             /><br />
             <Button
-                onClick={submitTokenId}
-                disabled={disable}
+                onClick={verifyToken}
+                disabled={(idDisable || imageDisable)}
                 variant="contained">
-                View Token
+                Verify Token
             </Button>
             <br /><br />
-            {error ? <Alert severity="error" sx={{ textAlign: "left"}}>{errorMsg}</Alert> : <div />}
+            {error ? <Alert severity="error">{errorMsg}</Alert> : <div />}
+            {resizing ? <Loading text="Resizing and slicing..." /> : <div />}
+            {generating ? <Loading text="Generating witnesses..." /> : <div />}
+            {converting ? <Loading text="Converting image to URI..." /> : <div />}
+            {error ? <Alert severity="error" sx={{ textAlign: "left" }}>{errorMsg}</Alert> : <div />}
             {!error && loaded && !loading ? <MetadataTable /> : <div />}
             {loading ? <Loading text="Loading tokenURI..." /> : <div />}
-        </Box >
+        </Box>
     );
 }
