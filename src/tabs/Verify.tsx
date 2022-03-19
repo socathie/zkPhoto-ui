@@ -47,7 +47,7 @@ export default function Upload() {
         setLoaded(false);
 
         setResizing(true);
-        let tmp = img2array('full-image');
+        let tmp = img2array('preview-image');
         setFullImage(tmp.dataURL);
         setResizing(false);
 
@@ -195,13 +195,12 @@ export default function Upload() {
                 Verify Token
             </Button>
             <br /><br />
-            {error ? <Alert severity="error">{errorMsg}</Alert> : <div />}
             {resizing ? <Loading text="Resizing and slicing..." /> : <div />}
             {generating ? <Loading text="Generating witnesses..." /> : <div />}
             {converting ? <Loading text="Converting image to URI..." /> : <div />}
+            {loading ? <Loading text="Loading tokenURI..." /> : <div />}
             {error ? <Alert severity="error" sx={{ textAlign: "left" }}>{errorMsg}</Alert> : <div />}
             {!error && loaded && !loading ? <MetadataTable /> : <div />}
-            {loading ? <Loading text="Loading tokenURI..." /> : <div />}
         </Box>
     );
 }

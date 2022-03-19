@@ -23,13 +23,20 @@ export async function getTokenURI(tokenId: number) {
     let errorMsg;
     let tokenURI = await zkPhoto.tokenURI(tokenId)
         .catch((error: any) => {
-            errorMsg = error.data.message;
+            console.log(error);
+            if (error.reason) {
+                errorMsg = error.reason;
+            } else if (error.data.message) {
+                errorMsg = error.data.message;
+            } else {
+                errorMsg = "Unknown error."
+            }
         });
 
     //console.log("tokenURI: ", tokenURI);
-    console.log("error: ", errorMsg);
 
     if (errorMsg) {
+        //console.log("error: ", errorMsg);
         throw errorMsg;
     }
 
@@ -42,13 +49,20 @@ export async function getTokenData(tokenId: number) {
     let errorMsg;
     let tokenData = await zkPhoto.getData(tokenId)
         .catch((error: any) => {
-            errorMsg = error.data.message;
+            console.log(error);
+            if (error.reason) {
+                errorMsg = error.reason;
+            } else if (error.data.message) {
+                errorMsg = error.data.message;
+            } else {
+                errorMsg = "Unknown error."
+            }
         });
 
     //console.log("tokenData: ", tokenData);
-    console.log("error: ", errorMsg);
 
     if (errorMsg) {
+        //console.log("error: ", errorMsg);
         throw errorMsg;
     }
 
@@ -63,7 +77,7 @@ export async function generateWitness(data: Array<Array<Array<number>>>) {
 
     for (var i = 0; i < 16; i++) {
         let calldata = await generateCalldata(data[i]);
-        if (!calldata) throw 'Error: Fail to generate witness.';
+        if (!calldata) throw ({ 'reason': 'Fail to generate witness.' });
         console.log('calldata generated');
         a.push(calldata[0]);
         b.push(calldata[1]);
@@ -81,13 +95,20 @@ export async function mint(name: string, description: string, image: string, wit
 
     let txn = await zkPhoto.mint(name, description, image, witness.a, witness.b, witness.c, witness.d)
         .catch((error: any) => {
-            errorMsg = error.data.message;
+            console.log(error);
+            if (error.reason) {
+                errorMsg = error.reason;
+            } else if (error.data.message) {
+                errorMsg = error.data.message;
+            } else {
+                errorMsg = "Unknown error."
+            }
         });
 
     console.log("transaction: ", txn);
-    console.log("error: ", errorMsg);
 
     if (errorMsg) {
+        //console.log("error: ", errorMsg);
         throw errorMsg;
     }
 

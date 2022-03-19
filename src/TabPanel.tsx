@@ -5,7 +5,7 @@ import Container from '@mui/material/Container'
 import Box from '@mui/material/Box';
 import About from './tabs/About';
 import View from './tabs/View';
-import Upload from './tabs/Upload';
+import Mint from './tabs/Mint';
 import Verify from './tabs/Verify';
 
 interface TabPanelProps {
@@ -61,25 +61,21 @@ export default function BasicTabs() {
         >
           <Tab label="zkPhoto" {...a11yProps(0)} disabled />
           <Tab label="About" {...a11yProps(1)} />
-          <Tab label="Capture" {...a11yProps(2)} />
-          <Tab label="Upload" {...a11yProps(3)} />
-          <Tab label="Verify" {...a11yProps(4)} />
-          <Tab label="View" {...a11yProps(5)} />
+          <Tab label="Mint" {...a11yProps(2)} />
+          <Tab label="Verify" {...a11yProps(3)} />
+          <Tab label="View" {...a11yProps(4)} />
         </Tabs>
       </Box>
       <TabPanel value={value} index={1}>
         <Container><About /></Container>
       </TabPanel>
       <TabPanel value={value} index={2}>
-        Capture
+        <Mint />
       </TabPanel>
       <TabPanel value={value} index={3}>
-        <Upload />
-      </TabPanel>
-      <TabPanel value={value} index={4}>
         <Verify />
       </TabPanel>
-      <TabPanel value={value} index={5}>
+      <TabPanel value={value} index={4}>
         <View />
       </TabPanel>
     </Box>

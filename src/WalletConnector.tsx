@@ -2,7 +2,7 @@ import Fab from '@mui/material/Fab';
 import Backdrop from '@mui/material/Backdrop';
 import { useEffect, useState } from 'react';
 
-const testnetChainId = '0x7a69'//'0x6357d2e0'
+const testnetChainId = '0x6357d2e0'
 
 export default function WalletConnector() {
   const { ethereum } = window;

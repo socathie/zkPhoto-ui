@@ -72,22 +72,10 @@ function DropzoneComponent(props) {
   const thumbnail = files.map(file => (
     <div key={file.name}>
       <img
+        id="preview-image"
         src={file.preview}
         alt={file.name}
         width="100%"
-      />
-    </div>
-  ));
-
-  const fullImage = files.map(file => (
-    <div key={file.name}>
-      <img
-        id="full-image"
-        src={file.preview}
-        alt={file.name}
-        width={1024}
-        height={1024}
-        hidden
       />
     </div>
   ));
@@ -102,9 +90,8 @@ function DropzoneComponent(props) {
       <div {...getRootProps({ style })}>
         <input {...getInputProps()} />
         <div>Drag and drop your image here.</div>
-        <div>All images will be resized to 1024x1024.</div>
+        <div>All images will be cropped and resized to 1024x1024.</div>
         <div>{thumbnail}</div>
-        <div>{fullImage}</div>
       </div>
     </section>
   )

@@ -3,10 +3,19 @@ export default function img2array(id: string) {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     const img = document.getElementById(id) as any;
-    canvas.width = img.width;
-    canvas.height = img.height;
-    ctx.drawImage(img, 0, 0, img.width, img.height);
-    const imageData = ctx.getImageData(0, 0, img.width, img.height);
+    canvas.width = 1024;
+    canvas.height = 1024;
+    console.log(img.width, img.height, img.naturalWidth, img.naturalHeight, canvas.width, canvas.height);
+    if (img.naturalHeight === img.naturalWidth) {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    } else if (img.naturalHeight > img.naturalWidth) {
+        const sy = (img.naturalHeight-img.naturalWidth) / 2 >> 0;
+        ctx.drawImage(img, 0, sy, img.naturalWidth, img.naturalWidth, 0, 0, canvas.width, canvas.height);
+    } else {
+        const sx = (img.naturalWidth-img.naturalHeight) / 2 >> 0;
+        ctx.drawImage(img, sx, 0, img.naturalHeight, img.naturalHeight, 0, 0, canvas.width, canvas.height);
+    }
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const dataURL = canvas.toDataURL("image/png");
 
     const data = imageData.data;
@@ -17,7 +26,7 @@ export default function img2array(id: string) {
     tmp = [];
 
     for (var i = 0; i < data.length; i += 4) {
-        if ((i % (img.width * 4) === 0) && (i > 0)) {
+        if ((i % (canvas.width * 4) === 0) && (i > 0)) {
             array.push(tmp);
             tmp = [];
         }
@@ -43,7 +52,7 @@ function sliceArray(array: Array<Array<Array<number>>>) {
         tmp = [];
         for (var j = 0; j < 256; j++) {
             for (var i = 0; i < 256; i++) {
-                tmp.push(array[y+j][x+i]);
+                tmp.push(array[y + j][x + i]);
             }
         }
         slicedArray.push(tmp);
