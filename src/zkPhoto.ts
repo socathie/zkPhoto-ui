@@ -74,10 +74,11 @@ export async function generateWitness(data: Array<Array<Array<number>>>) {
     let b = [];
     let c = [];
     let d = [];
+    let errorString = 'Fail to generate witness.'
 
     for (var i = 0; i < 16; i++) {
         let calldata = await generateCalldata(data[i]);
-        if (!calldata) throw ({ 'reason': 'Fail to generate witness.' });
+        if (!calldata) throw errorString;
         console.log('calldata generated');
         a.push(calldata[0]);
         b.push(calldata[1]);
