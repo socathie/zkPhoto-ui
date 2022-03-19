@@ -1,5 +1,4 @@
-const wc  = require("./witness_calculator.js");
-//const { readFileSync, writeFile } = require("fs");
+import wc from "./witness_calculator";
 
 export async function generateWitness (input) {
 	const response = await fetch('zkPhoto.wasm');
