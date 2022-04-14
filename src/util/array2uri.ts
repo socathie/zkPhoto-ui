@@ -59,8 +59,6 @@ export default async function array2uri(array: Array<Array<any>>) {
 
     const dataURL = await jimp.getBase64Async("image/png");
     //console.log(dataURL);
-    
-    document.removeChild(canvas);
 
     return dataURL;
 }
