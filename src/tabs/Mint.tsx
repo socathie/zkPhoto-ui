@@ -36,7 +36,7 @@ export default function Mint() {
         setError(false);
 
         setResizing(true);
-        let tmp = img2array('preview-image');
+        let tmp = await img2array('preview-image');
         setFullImage(tmp.dataURL);
         setResizing(false);
 
@@ -51,7 +51,7 @@ export default function Mint() {
         setGenerating(false);
 
         setConverting(true);
-        let tmpImage = array2uri(witness.d);
+        let tmpImage = await array2uri(witness.d);
         setImage(tmpImage);
         setConverting(false);
 

@@ -47,7 +47,7 @@ export default function Upload() {
         setLoaded(false);
 
         setResizing(true);
-        let tmp = img2array('preview-image');
+        let tmp = await img2array('preview-image');
         setFullImage(tmp.dataURL);
         setResizing(false);
 
@@ -62,7 +62,7 @@ export default function Upload() {
         setGenerating(false);
 
         setConverting(true);
-        let tmpImage = array2uri(witness.d);
+        let tmpImage = await array2uri(witness.d);
         setZkImage(tmpImage);
         setConverting(false);
 
@@ -89,7 +89,7 @@ export default function Upload() {
                 setLoading(false);
                 throw error;
             });
-        setTokenImage(array2uri(tokenData));
+        setTokenImage(await array2uri(tokenData));
 
         setKey(key+1);
         setImageDisable(true);

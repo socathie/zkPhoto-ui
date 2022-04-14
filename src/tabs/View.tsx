@@ -56,7 +56,7 @@ export default function View() {
                 setLoading(false);
                 throw error;
             });
-        setImage(array2uri(tokenData));
+        setImage(await array2uri(tokenData));
         
         setLoading(false);
         setLoaded(true);

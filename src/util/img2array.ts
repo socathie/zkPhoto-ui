@@ -1,32 +1,46 @@
-export default function img2array(id: string) {
+import Jimp from 'jimp/es';
 
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+export default async function img2array(id: string) {
+
     const img = document.getElementById(id) as any;
-    canvas.width = 1024;
-    canvas.height = 1024;
-    console.log(img.width, img.height, img.naturalWidth, img.naturalHeight, canvas.width, canvas.height);
-    if (img.naturalHeight === img.naturalWidth) {
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    } else if (img.naturalHeight > img.naturalWidth) {
-        const sy = (img.naturalHeight-img.naturalWidth) / 2 >> 0;
-        ctx.drawImage(img, 0, sy, img.naturalWidth, img.naturalWidth, 0, 0, canvas.width, canvas.height);
-    } else {
-        const sx = (img.naturalWidth-img.naturalHeight) / 2 >> 0;
-        ctx.drawImage(img, sx, 0, img.naturalHeight, img.naturalHeight, 0, 0, canvas.width, canvas.height);
-    }
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const dataURL = canvas.toDataURL("image/png");
+    console.log(img.src);
 
-    const data = imageData.data;
+    const jimp = await Jimp.read(img.src)
+        .then(image => image.cover(1024, 1024));
 
+    //console.log(jimp);
+
+    const data = jimp.bitmap.data;
+    const dataURL = await jimp.getBase64Async("image/png");
+    //console.log(dataURL);
+    /*
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+        //const img = document.getElementById(id) as any;
+        canvas.width = 1024;
+        canvas.height = 1024;
+        console.log(img.width, img.height, img.naturalWidth, img.naturalHeight, canvas.width, canvas.height);
+        if (img.naturalHeight === img.naturalWidth) {
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        } else if (img.naturalHeight > img.naturalWidth) {
+            const sy = (img.naturalHeight - img.naturalWidth) / 2 >> 0;
+            ctx.drawImage(img, 0, sy, img.naturalWidth, img.naturalWidth, 0, 0, canvas.width, canvas.height);
+        } else {
+            const sx = (img.naturalWidth - img.naturalHeight) / 2 >> 0;
+            ctx.drawImage(img, sx, 0, img.naturalHeight, img.naturalHeight, 0, 0, canvas.width, canvas.height);
+        }
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        //const dataURL = canvas.toDataURL("image/png");
+    
+        const data = imageData.data;
+    */
     let array: Array<Array<Array<number>>>;
     array = [];
     let tmp: Array<Array<number>>;
     tmp = [];
 
     for (var i = 0; i < data.length; i += 4) {
-        if ((i % (canvas.width * 4) === 0) && (i > 0)) {
+        if ((i % (1024 * 4) === 0) && (i > 0)) {
             array.push(tmp);
             tmp = [];
         }

@@ -1,6 +1,8 @@
 import { BigNumber } from "ethers";
+import Jimp from "jimp";
+import { Buffer } from "buffer";
 
-export default function array2uri(array: Array<Array<any>>) {
+export default async function array2uri(array: Array<Array<any>>) {
 
     const canvas = document.createElement('canvas');
     canvas.width = 64;
@@ -22,18 +24,22 @@ export default function array2uri(array: Array<Array<any>>) {
                 sliceArray[j][i][0] = parseInt(tmp.slice(0, 2), 16);
                 sliceArray[j][i][1] = parseInt(tmp.slice(2, 4), 16);
                 sliceArray[j][i][2] = parseInt(tmp.slice(4, 6), 16);
+                sliceArray[j][i][3] = 255;
 
                 sliceArray[j][i + 1][0] = parseInt(tmp.slice(8, 10), 16);
                 sliceArray[j][i + 1][1] = parseInt(tmp.slice(10, 12), 16);
                 sliceArray[j][i + 1][2] = parseInt(tmp.slice(12, 14), 16);
+                sliceArray[j][i + 1][3] = 255;
 
                 sliceArray[j + 1][i][0] = parseInt(tmp.slice(16, 18), 16);
                 sliceArray[j + 1][i][1] = parseInt(tmp.slice(18, 20), 16);
                 sliceArray[j + 1][i][2] = parseInt(tmp.slice(20, 22), 16);
+                sliceArray[j + 1][i][3] = 255;
 
                 sliceArray[j + 1][i + 1][0] = parseInt(tmp.slice(24, 26), 16);
                 sliceArray[j + 1][i + 1][1] = parseInt(tmp.slice(26, 28), 16);
                 sliceArray[j + 1][i + 1][2] = parseInt(tmp.slice(28, 30), 16);
+                sliceArray[j + 1][i + 1][3] = 255;
 
                 idx++;
             }
@@ -43,7 +49,18 @@ export default function array2uri(array: Array<Array<any>>) {
         ctx.putImageData(imageData, x, y);
     }
 
-    const dataURL = canvas.toDataURL("image/png");
+    //console.log(ctx.getImageData(0,0,64,64));
+
+    const jimp = new Jimp(64, 64) as Jimp;
+    
+    jimp.bitmap.data = Buffer.from(ctx.getImageData(0,0,64,64).data.buffer);
+
+    //console.log(jimp);
+
+    const dataURL = await jimp.getBase64Async("image/png");
+    //console.log(dataURL);
+    
+    document.removeChild(canvas);
 
     return dataURL;
 }
