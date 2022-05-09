@@ -32,6 +32,12 @@ export default function Mint() {
 
     const mintToken = async (event: any) => {
         event.preventDefault();
+
+        if (name.includes("\"")||description.includes("\"")) {
+            alert("Quotations marks disallowed in metadata");
+            return;
+        }
+
         setMinted(false);
         setError(false);
 
@@ -105,6 +111,12 @@ export default function Mint() {
         }
     };
 
+    const keyHandler = async (event: any) => {
+        if (['"'].includes(event.key)) {
+            event.preventDefault();
+        }
+    };
+
     return (
         <Box
             component="form"
@@ -127,6 +139,7 @@ export default function Mint() {
                     inputProps: { maxLength: 140 }
                 }}
                 variant="filled"
+                onKeyDown={keyHandler}
                 onChange={nameInputHandler}
                 onKeyPress={enterHandler}
             /><br />
@@ -140,6 +153,7 @@ export default function Mint() {
                     inputProps: { maxLength: 280 }
                 }}
                 variant="filled"
+                onKeyDown={keyHandler}
                 onChange={descInputHandler}
                 onKeyPress={enterHandler}
             /><br />
